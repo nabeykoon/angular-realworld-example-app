@@ -31,12 +31,43 @@ describe("Signup", () => {
     });
 
     it("Test valid login", () => {
+        cy.intercept({
+            method: 'GET',
+            url: '**/tags',
+        },
+            {
+                fixture: "popularTags.json"
+            }).as('tags');
         cy.visit("http://localhost:4200/");
         cy.get(".nav").contains("Sign in").click();
         cy.get("[placeholder='Email']").type(email);
         cy.get("[placeholder='Password']").type(Password);
         cy.get("button").contains("Sign in").click();
-        cy.get("a[href^='/profile/']").should("have.text", " "+ username+ " ");
+        cy.get("a[href^='/profile/']").should("have.text", " " + username + " ");
+        cy.wait("@tags");
+        cy.get("div.tag-list").should("have.text", " Nadeera  cypress  appliTools  nodejs  Testng ");
+    });
+
+    it("Mock global feed data", () => {
+        cy.intercept({
+            method: 'GET',
+            url: '**/tags',
+        },
+            {
+                fixture: "popularTags.json"
+            }).as('tags');
+        cy.intercept({
+            method: 'GET',
+            url: '**/articles/*',
+        },
+            {
+                fixture: "articles.json"
+            }).as('articles');
+        cy.visit("http://localhost:4200/");
+        cy.get(".nav").contains("Sign in").click();
+        cy.get("[placeholder='Email']").type(email);
+        cy.get("[placeholder='Password']").type(Password);
+        cy.get("button").contains("Sign in").click();
     })
 
 })
